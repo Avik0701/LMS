@@ -1,0 +1,287 @@
+X1 = []
+Y1=[] 
+i=7
+while (i < len(ticker_info.date)):
+  price = ticker_info.low[i-4]
+  price1 = ticker_info.low[i-1]
+  price2 = ticker_info.low[i-2]
+  price3 = ticker_info.low[i-3]
+  priced1 = ticker_info.low[i-5]
+  priced2 = ticker_info.low[i-6]
+  priced3 = ticker_info.low[i-7]
+  max_before = max(price1,price2,price3)
+  max_after = max(priced1,priced2,priced3)
+  change = max_after + max_before - 2*price
+  if(change > 0.04*price and price < max_before and price < max_after):
+    print(ticker_info.date[i])
+    X1.append([i])
+    Y1.append([price])
+  i=i+1
+print(X1)
+print(Y1)
+
+
+
+
+flag = 0
+
+regressor1 = LinearRegression()
+regressor1.fit(X1, Y1)
+viz_test1 = plt
+viz_test1.scatter(X1, Y1, color='red')
+viz_test1.plot(X1, regressor1.predict(X1), color='black')
+viz_test1.title('Price Prediction')
+viz_test1.xlabel('DAYS')
+viz_test1.ylabel('PRICE')
+viz_test1.show()
+
+#after getting the line, use y_pred for today's date and compare it with price
+y_pred11 = regressor1.predict([[len(ticker_info.date)*22/30]])
+print(int(y_pred11))
+y_pred1 = int(y_pred11)
+price = ticker_info.low[i-4]
+price_top1 = y_pred1*1.01
+price_bottom1 = y_pred1*0.99
+price_br1 = y_pred1*0.95
+if(price < price_top1 and price > price_bottom1 ):
+  print("Price Support")
+  print()
+  print ("Buy this stock - ",ticker)
+  flag=flag+1
+if(price < price_br1):
+  print("Price Breakdown!!")
+  print()
+  print("Sell it - ",ticker)
+  flag=flag+1
+
+
+
+
+
+#get a end date (3 days before to today) 
+# for resistance
+X2 = []
+Y2 = [] 
+i=7
+while (i < len(ticker_info.date)):
+  price = ticker_info.high[i-4]
+  price1 = ticker_info.high[i-1]
+  price2 = ticker_info.high[i-2]
+  price3 = ticker_info.high[i-3]
+  priced1 = ticker_info.high[i-5]
+  priced2 = ticker_info.high[i-6]
+  priced3 = ticker_info.high[i-7]
+  min_before = min(price1,price2,price3)
+  min_after = min(priced1,priced2,priced3)
+  change = 2*price - min_before - min_after
+  if(change > 0.04*price and price > min_before and price > min_after):
+    print(ticker_info.date[i])
+    X2.append([i])
+    Y2.append([price])
+  i=i+1
+print(X2)
+print(Y2)
+
+
+
+
+
+#doing it for resistance
+#the date will be on x-axis, price on y axis
+
+regressor2 = LinearRegression()
+regressor2.fit(X2, Y2)
+viz_test2 = plt
+viz_test2.scatter(X2, Y2, color='red')
+viz_test2.plot(X2, regressor2.predict(X2), color='black')
+viz_test2.title('Price Prediction')
+viz_test2.xlabel('DAYS')
+viz_test2.ylabel('PRICE')
+viz_test2.show()
+#after getting the line, use y_pred for today's date and compare it with price
+y_pred22 = regressor2.predict([[len(ticker_info.date)*22/30]])
+y_pred = int(y_pred22)
+print(y_pred)
+price = ticker_info.low[i-4]
+price_top2 = y_pred*1.01
+price_bottom2 = y_pred*0.99
+price_br2 = y_pred*1.05
+if(price < price_top2 and price > price_bottom2 ):
+  print("Price resistance")
+  print()
+  print ("Sell this stock - ",ticker)
+  flag=flag+1
+if(price > price_br2):
+  print("Price Breakout!!")
+  print()
+  print("Buy it - ",ticker)
+  flag=flag+1
+if(flag > 1):
+  print("Don't trade the price movement is unusual")
+
+
+#get a end date (3 days before to today) 
+# for support with point picking
+X1 = []
+Y1=[] 
+j1=1
+appendY = 1000000
+appendX = 0
+while (i < len(ticker_info.date)):
+  price = ticker_info.low[i-4]
+  price1 = ticker_info.low[i-1]
+  price2 = ticker_info.low[i-2]
+  price3 = ticker_info.low[i-3]
+  priced1 = ticker_info.low[i-5]
+  priced2 = ticker_info.low[i-6]
+  priced3 = ticker_info.low[i-7]
+  max_before = max(price1,price2,price3)
+  max_after = max(priced1,priced2,priced3)
+  change = max_after + max_before - 2*price
+  if(change > 0.04*price and price < max_before and price < max_after and appendY > price ):
+    appendX = i-4
+    appendY = price
+  if(i > j1*20 + 7 and appendY != 1000000):
+    X1.append([appendX])
+    Y1.append([appendY])
+    appendY=1000000
+    j1=j1+1
+  i=i+1
+if(appendY != 1000000):
+  X1.append([appendX])
+  Y1.append([appendY])
+#print(X1)
+#print(Y1)
+
+#doing it for support
+#the date will be on x-axis, price on y axis 
+flag = 0
+
+regressor1 = LinearRegression()
+regressor1.fit(X1, Y1)
+viz_test1 = plt
+viz_test1.scatter(X1, Y1, color='red')
+viz_test1.plot(X1, regressor1.predict(X1), color='black')
+viz_test1.title('Price Prediction')
+viz_test1.xlabel('DAYS')
+viz_test1.ylabel('PRICE')
+viz_test1.show()
+
+#after getting the line, use y_pred for today's date and compare it with price
+y_pred11 = regressor1.predict([[len(ticker_info.date)*22/30]])
+y_pred1 = int(y_pred11)
+#print("Current Support:",y_pred1)
+price = ticker_info.low[i-1]
+price_top1 = y_pred1*1.01
+price_bottom1 = y_pred1*0.99
+price_br1 = y_pred1*0.95
+if(price < price_top1 and price > price_bottom1 ):
+  flag=flag+1
+if(price < price_br1):
+  flag=flag+2
+
+
+
+
+X2 = []
+Y2 = [] 
+i=i1
+appendY = 0
+appendX = 0
+j2 = 0
+while (i < len(ticker_info.date)):
+  price = ticker_info.high[i-4]
+  price1 = ticker_info.high[i-1]
+  price2 = ticker_info.high[i-2]
+  price3 = ticker_info.high[i-3]
+  priced1 = ticker_info.high[i-5]
+  priced2 = ticker_info.high[i-6]
+  priced3 = ticker_info.high[i-7]
+  min_before = min(price1,price2,price3)
+  min_after = min(priced1,priced2,priced3)
+  change = 2*price - min_before - min_after
+  if(change > 0.04*price and price > min_before and price > min_after and price > appendY):
+    appendX = i-4
+    appendY = price
+  if(i > j2*20 + 7 and appendY != 0):
+   X2.append([appendX])
+   Y2.append([appendY])
+   appendY=0
+   j2=j2+1
+  i=i+1
+if(appendY != 0):
+  X2.append([appendX])
+  Y2.append([appendY])
+#print(X2)
+#print(Y2)
+
+#doing it for resistance
+#the date will be on x-axis, price on y axis
+
+regressor2 = LinearRegression()
+regressor2.fit(X2,Y2)
+viz_test2 = plt
+viz_test2.scatter(X2, Y2, color='red')
+viz_test2.plot(X2, regressor2.predict(X2), color='black')
+viz_test2.title('Price Prediction')
+viz_test2.xlabel('DAYS')
+viz_test2.ylabel('PRICE')
+viz_test2.show()
+#after getting the line, use y_pred for today's date and compare it with price
+y_pred22 = regressor2.predict([[len(ticker_info.date)*22/30]])
+y_pred = int(y_pred22)
+#print("Current Resistance:",y_pred)
+price = ticker_info.low[i-1]
+price_top2 = y_pred*1.01
+price_bottom2 = y_pred*0.99
+price_br2 = y_pred*1.05
+
+if(price < price_top2 and price > price_bottom2 ):
+  flag=flag+3
+if(price > price_br2):
+  flag=flag+4
+
+  
+flag=0
+y_pred11 = regressor1.predict([[len(ticker_info.date)*22/30]])
+y_pred1 = int(y_pred11)
+#print("Current Support:",y_pred1)
+price = ticker_info.low[i-1]
+price_top1 = y_pred1*1.01
+price_bottom1 = y_pred1*0.99
+price_br1 = y_pred1*0.95
+if(price < price_top1 and price > price_bottom1 ):
+  flag=flag+1
+if(price < price_br1):
+  flag=flag+2
+
+y_pred22 = regressor2.predict([[len(ticker_info.date)*22/30]])
+y_pred = int(y_pred22)
+#print("Current Resistance:",y_pred)
+price = ticker_info.low[i-1]
+price_top2 = y_pred*1.01
+price_bottom2 = y_pred*0.99
+price_br2 = y_pred*1.05
+
+if(price < price_top2 and price > price_bottom2 ):
+  flag=flag+3
+if(price > price_br2):
+  flag=flag+4
+
+ticker1 = ticker[:-3]
+if(flag==1):
+  print("Price Support")
+  print ("Buy this stock - ",ticker1)
+if(flag==2):
+  print("Price Breakdown!!")
+  print("Sell it -",ticker1)
+if(flag==3):
+  print("Price resistance")
+  print ("Sell this stock -",ticker1)
+if(flag==4):
+  print("Price Breakout!!")
+  print("Buy it -",ticker1)
+if(flag>4):
+  print("Don't trade the price movement is unusual")
+if(flag==0):
+  print("Nothing evident from price action -",ticker1)
